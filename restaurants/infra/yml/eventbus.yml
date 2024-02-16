@@ -1,0 +1,13 @@
+Resources:
+  Bus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: ${opt:stage}-${self:service}-bus
+
+Outputs:
+  busName:
+    Value:
+      Ref: Bus
+  busArn:
+    Value:
+      Fn::GetAtt: [Bus, Arn]

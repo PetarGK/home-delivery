@@ -1,0 +1,59 @@
+Resources:
+  Stream:
+    Type: AWS::Kinesis::Stream
+    Properties:
+      Name: ${opt:stage}-${self:service}-stream
+      RetentionPeriodHours: 24
+      StreamEncryption:
+        EncryptionType: KMS
+        KeyId: alias/aws/kinesis
+      StreamModeDetails:
+        StreamMode: ON_DEMAND
+
+  BusStreamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: internal
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - kinesis:PutRecord
+                  - kinesis:PutRecords
+                Resource:
+                  - Fn::GetAtt: [Stream, Arn]
+
+  StreamEventRule:
+    Type: AWS::Events::Rule
+    Properties:
+      EventBusName:
+        Ref: Bus
+      EventPattern:
+        detail:
+          type:
+            - anything-but: fault
+      State: ENABLED
+      Targets:
+        - Id: Stream
+          Arn:
+            Fn::GetAtt: [Stream, Arn]
+          RoleArn:
+            Fn::GetAtt: [BusStreamRole, Arn]
+          KinesisParameters:
+            PartitionKeyPath: $.detail.partitionKey
+          InputPath: $.detail
+
+Outputs:
+  streamName:
+    Value:
+      Ref: Stream
+  streamArn:
+    Value:
+      Fn::GetAtt: [Stream, Arn]

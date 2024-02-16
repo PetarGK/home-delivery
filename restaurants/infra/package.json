@@ -1,0 +1,12 @@
+{
+  "name": "infra",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "sls package --stage dev",
+    "deploy": "sls deploy --stage dev --aws-profile personal-dev"
+  },
+  "author": "Petar Korudzhiev",
+  "license": "ISC"
+}
