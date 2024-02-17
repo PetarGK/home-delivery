@@ -1,0 +1,32 @@
+service: restaurants-menus
+useDotenv: true
+
+plugins:
+  - serverless-esbuild
+
+provider:
+  name: aws
+  stackName: ${opt:stage}-${self:service}
+  runtime: nodejs20.x
+  architecture: arm64
+  memorySize: 256
+  timeout: 5
+  logRetentionInDays: 30
+  versionFunctions: false
+  environment:
+    AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+    ENTITIES_TABLE_NAME: ${opt:stage}-${self:service}-entities
+    STREAM_ARN: ${cf:${self:custom.infraStack}.streamArn}
+    COGNITO_USERPOOL_ARN: ${cf:${self:custom.infraStack}.poolArn}
+
+custom:
+  infraStack: ${opt:stage}-restaurants-infra
+
+package:
+  individually: true
+
+functions:
+  - ${file(yml/functions.yml)}
+
+resources:
+  - ${file(yml/tables.yml)}

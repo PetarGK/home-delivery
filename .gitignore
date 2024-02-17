@@ -17,3 +17,5 @@ bootstrap
 
 .terraform/
 **/cloud/*.zip
+.serverless/
+**/node_modules/*

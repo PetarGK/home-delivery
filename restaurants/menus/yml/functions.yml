@@ -1,0 +1,33 @@
+rest:
+  handler: src/rest/index.handle
+  environment:
+    ENTITIES_TABLE_NAME: ${self:provider.environment.ENTITIES_TABLE_NAME}
+  events:
+    - http:
+        path: "{proxy+}"
+        method: any
+        authorizer:
+          name: PrivateAuthorizer
+          type: COGNITO_USER_POOLS
+          arn: ${self:provider.environment.COGNITO_USERPOOL_ARN}
+          scopes:
+            - aws.cognito.signin.user.admin
+
+listener:
+  handler: src/listener/index.handle
+  events:
+    - stream:
+        type: kinesis
+        arn: ${self:provider.environment.STREAM_ARN}
+        batchSize: 100
+        startingPosition: TRIM_HORIZON
+
+trigger:
+  handler: src/trigger/index.handle
+  events:
+    - stream:
+        type: dynamodb
+        arn:
+          Fn::GetAtt: [EntitiesTable, StreamArn]
+        batchSize: 100
+        startingPosition: TRIM_HORIZON

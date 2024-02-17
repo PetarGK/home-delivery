@@ -1,0 +1,4 @@
+aws cognito-idp admin-set-user-password --user-pool-id <poolId> --username <email> --password <pass> --permanent --profile personal-dev
+
+
+aws cognito-idp initiate-auth --region us-east-1 --auth-flow ALLOW_USER_PASSWORD_AUTH --client-id <clientId> --auth-parameters USERNAME=<email>,PASSWORD=<pass> --profile personal-dev
