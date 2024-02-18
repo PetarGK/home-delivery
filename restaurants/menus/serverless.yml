@@ -3,6 +3,7 @@ useDotenv: true
 
 plugins:
   - serverless-esbuild
+  - serverless-iam-roles-per-function
 
 provider:
   name: aws
@@ -15,9 +16,6 @@ provider:
   versionFunctions: false
   environment:
     AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
-    ENTITIES_TABLE_NAME: ${opt:stage}-${self:service}-entities
-    STREAM_ARN: ${cf:${self:custom.infraStack}.streamArn}
-    COGNITO_USERPOOL_ARN: ${cf:${self:custom.infraStack}.poolArn}
 
 custom:
   infraStack: ${opt:stage}-restaurants-infra

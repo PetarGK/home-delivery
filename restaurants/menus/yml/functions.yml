@@ -1,7 +1,17 @@
 rest:
   handler: src/rest/index.handle
   environment:
-    ENTITIES_TABLE_NAME: ${self:provider.environment.ENTITIES_TABLE_NAME}
+    ENTITIES_TABLE_NAME: ${opt:stage}-${self:service}-entities
+  iamRoleStatementsName: ${self:provider.stackName}-rest-role
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:GetItem
+        - dynamodb:Query
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+      Resource:
+        - !GetAtt [EntitiesTable, Arn]
   events:
     - http:
         path: "{proxy+}"
@@ -9,7 +19,7 @@ rest:
         authorizer:
           name: PrivateAuthorizer
           type: COGNITO_USER_POOLS
-          arn: ${self:provider.environment.COGNITO_USERPOOL_ARN}
+          arn: ${cf:${self:custom.infraStack}.poolArn}
           scopes:
             - aws.cognito.signin.user.admin
 
@@ -18,7 +28,7 @@ listener:
   events:
     - stream:
         type: kinesis
-        arn: ${self:provider.environment.STREAM_ARN}
+        arn: ${cf:${self:custom.infraStack}.streamArn}
         batchSize: 100
         startingPosition: TRIM_HORIZON
 

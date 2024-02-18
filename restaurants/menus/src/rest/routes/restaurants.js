@@ -1,11 +1,16 @@
-export const getThing = (req, res) => req.namespace.models.thing
-    .get(req.params.id)
-    .then((data) => res.status(200).json(data));
+export const getRestaurant = async (req, res) => {
 
-export const saveThing = (req, res) => req.namespace.models.thing
-    .save(req.params.id, req.body)
-    .then(() => res.status(200).json({}));
+    const data = await req.namespace.models.restaurant.get({ name: req.params.id });
 
-export const deleteThing = (req, res) => req.namespace.models.thing
-    .delete(req.params.id)
-    .then(() => res.status(200).json({}));
+    if (!data.Item)
+        return res.status(404).json({});
+
+    return res.status(200).json(data.Item);
+}
+
+export const saveRestaurant = async (req, res) => {
+
+    await req.namespace.models.restaurant.put(req.body)
+
+    return res.status(200).json({});
+}

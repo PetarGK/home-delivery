@@ -2,7 +2,7 @@ Resources:
   EntitiesTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: ${self:provider.environment.ENTITIES_TABLE_NAME}
+      TableName: ${opt:stage}-${self:service}-entities
       AttributeDefinitions:
         - AttributeName: pk
           AttributeType: S

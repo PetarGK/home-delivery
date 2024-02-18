@@ -10,12 +10,16 @@
   "author": "Petar Korudzhiev",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.515.0",
+    "@aws-sdk/lib-dynamodb": "^3.515.0",
     "aws-lambda-stream": "^0.50.0",
+    "dynamodb-toolbox": "^0.9.2",
     "lambda-api": "^1.0.3"
   },
   "devDependencies": {
     "esbuild": "^0.20.0",
     "serverless": "^3.38.0",
-    "serverless-esbuild": "^1.51.0"
+    "serverless-esbuild": "^1.51.0",
+    "serverless-iam-roles-per-function": "^3.2.0"
   }
 }
