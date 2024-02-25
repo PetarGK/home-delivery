@@ -30,3 +30,7 @@ Outputs:
   poolArn:
     Value:
       Fn::GetAtt: [UserPool, Arn]
+
+  clientId:
+    Value:
+      Ref: UserPoolClient

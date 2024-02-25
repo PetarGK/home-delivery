@@ -1,9 +1,5 @@
-service: restaurants-menus
+service: restaurants-gateway
 useDotenv: true
-
-plugins:
-  - serverless-esbuild
-  - serverless-iam-roles-per-function
 
 provider:
   name: aws
@@ -11,20 +7,15 @@ provider:
   runtime: nodejs20.x
   architecture: arm64
   memorySize: 256
-  timeout: 5
+  timeout: 29
   logRetentionInDays: 30
   versionFunctions: false
   environment:
     AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
 
 custom:
-  infraStack: ${opt:stage}-restaurants-infra
-
-package:
-  individually: true
-
-functions:
-  - ${file(yml/functions.yml)}
+  authStack: ${opt:stage}-restaurants-auth
 
 resources:
-  - ${file(yml/tables.yml)}
+  - ${file(yml/api.yml)}
+  - ${file(yml/authorizer.yml)}

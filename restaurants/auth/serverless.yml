@@ -1,0 +1,17 @@
+service: restaurants-auth
+useDotenv: true
+
+provider:
+  name: aws
+  stackName: ${opt:stage}-${self:service}
+  runtime: nodejs20.x
+  architecture: arm64
+  memorySize: 256
+  timeout: 29
+  logRetentionInDays: 30
+  versionFunctions: false
+  environment:
+    AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+
+resources:
+  - ${file(yml/cognito.yml)}

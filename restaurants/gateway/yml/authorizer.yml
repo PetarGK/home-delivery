@@ -1,0 +1,24 @@
+Resources:
+  ApiGatewayAuthorizer:
+    Type: AWS::ApiGatewayV2::Authorizer
+    Properties:
+      Name: ${opt:stage}-${self:service}-authorizer
+      ApiId: !Ref ApiGateway
+      AuthorizerType: JWT
+      IdentitySource:
+        - $request.header.Authorization
+      JwtConfiguration:
+        Audience:
+          - ${cf:${self:custom.authStack}.clientId}
+        Issuer:
+          Fn::Join:
+            - ""
+            - - "https://cognito-idp."
+              - "${aws:region}"
+              - ".amazonaws.com/"
+              - ${cf:${self:custom.authStack}.poolName}
+
+Outputs:
+  apiAuthorizer:
+    Value:
+      Ref: ApiGatewayAuthorizer

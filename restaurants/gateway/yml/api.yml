@@ -1,0 +1,21 @@
+Resources:
+  ApiGateway:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: ${opt:stage}-${self:service}-api
+      ProtocolType: HTTP
+
+  ApiGatewayStage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      ApiId: !Ref ApiGateway
+      StageName: ${opt:stage}
+      AutoDeploy: true
+
+Outputs:
+  apiId:
+    Value:
+      Ref: ApiGateway
+  apiEndpoint:
+    Description: "HTTP API endpoint URL"
+    Value: !Sub "https://${ApiGateway.ApiId}.execute-api.${AWS::Region}.amazonaws.com/${opt:stage}"

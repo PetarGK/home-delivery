@@ -1,6 +1,6 @@
-import { Restaurant, Category } from '../connectors/dynamodb';
-import { getRestaurant, saveRestaurant } from './routes/restaurants';
-import { listCategories, saveCategory } from './routes/categories';
+import { Restaurant, Category } from '../../connectors/dynamodb';
+import { getRestaurant, updateRestaurant } from '../../routes/restaurants';
+import { listCategories, saveCategory } from '../../routes/categories';
 
 const api = require('lambda-api')();
 
@@ -10,7 +10,7 @@ api.use((req, res, next) => {
 });
 
 api.get('/restaurants/:id', getRestaurant);
-api.post('/restaurants', saveRestaurant);
+api.put('/restaurants/:id', updateRestaurant);
 
 api.get('/restaurants/:id/categories', listCategories);
 api.post('/restaurants/:id/categories', saveCategory);

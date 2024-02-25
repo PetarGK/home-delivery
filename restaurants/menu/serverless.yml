@@ -1,0 +1,34 @@
+service: restaurants-menu
+useDotenv: true
+
+plugins:
+  - serverless-esbuild
+  - serverless-iam-roles-per-function
+
+provider:
+  name: aws
+  stackName: ${opt:stage}-${self:service}
+  runtime: nodejs20.x
+  architecture: arm64
+  memorySize: 256
+  timeout: 5
+  logRetentionInDays: 30
+  versionFunctions: false
+  environment:
+    AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+  httpApi:
+    id: ${cf:${self:custom.gatewayStack}.apiId}
+
+custom:
+  busStack: ${opt:stage}-restaurants-eventbus
+  authStack: ${opt:stage}-restaurants-auth
+  gatewayStack: ${opt:stage}-restaurants-gateway
+
+package:
+  individually: true
+
+functions:
+  - ${file(yml/functions.yml)}
+
+resources:
+  - ${file(yml/tables.yml)}

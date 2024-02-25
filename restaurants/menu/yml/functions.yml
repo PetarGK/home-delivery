@@ -1,0 +1,60 @@
+register:
+  handler: src/functions/register/index.handle
+  environment:
+    STAGE: ${opt:stage}
+    ENTITIES_TABLE_NAME: ${opt:stage}-${self:service}-entities
+    RECAPTURE_SECRET_KEY: ${env:RECAPTURE_SECRET_KEY}
+  iamRoleStatementsName: ${self:provider.stackName}-register-role
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:PutItem
+      Resource:
+        - !GetAtt [EntitiesTable, Arn]
+  events:
+    - httpApi:
+        path: /restaurants
+        method: post
+
+rest:
+  handler: src/functions/rest/index.handle
+  environment:
+    ENTITIES_TABLE_NAME: ${opt:stage}-${self:service}-entities
+  iamRoleStatementsName: ${self:provider.stackName}-rest-role
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:GetItem
+        - dynamodb:Query
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+      Resource:
+        - !GetAtt [EntitiesTable, Arn]
+  events:
+    - httpApi:
+        path: "/restaurants"
+        method: "*"
+        authorizer:
+          type: jwt
+          id: ${cf:${self:custom.gatewayStack}.apiAuthorizer}
+          scopes:
+            - aws.cognito.signin.user.admin
+
+listener:
+  handler: src/functions/listener/index.handle
+  events:
+    - stream:
+        type: kinesis
+        arn: ${cf:${self:custom.busStack}.streamArn}
+        batchSize: 100
+        startingPosition: TRIM_HORIZON
+
+trigger:
+  handler: src/functions/trigger/index.handle
+  events:
+    - stream:
+        type: dynamodb
+        arn:
+          Fn::GetAtt: [EntitiesTable, StreamArn]
+        batchSize: 100
+        startingPosition: TRIM_HORIZON

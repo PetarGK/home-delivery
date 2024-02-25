@@ -53,7 +53,10 @@ export const Restaurant = new Entity({
     },
     name: { type: 'string', required: true },
     desc: { type: 'string' },
-    imgUrl: { type: 'string' }
+    imgUrl: { type: 'string' },
+    email: { type: 'string' },
+    status: { type: 'string' },
+    ttl: { type: 'number' }
   },
 
   // Assign it to our table

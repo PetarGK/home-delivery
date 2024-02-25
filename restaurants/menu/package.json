@@ -1,11 +1,11 @@
 {
-  "name": "menus",
+  "name": "menu",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "sls package --stage dev --aws-profile personal-dev",
-    "deploy": "sls deploy --stage dev --aws-profile personal-dev"
+    "build": "npx sls package --stage dev --aws-profile personal-dev",
+    "deploy": "npx sls deploy --stage dev --aws-profile personal-dev"
   },
   "author": "Petar Korudzhiev",
   "license": "ISC",
@@ -13,8 +13,10 @@
     "@aws-sdk/client-dynamodb": "^3.515.0",
     "@aws-sdk/lib-dynamodb": "^3.515.0",
     "aws-lambda-stream": "^0.50.0",
+    "dayjs": "^1.11.10",
     "dynamodb-toolbox": "^0.9.2",
-    "lambda-api": "^1.0.3"
+    "lambda-api": "^1.0.3",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "esbuild": "^0.20.0",

@@ -1,4 +1,4 @@
-service: restaurants-infra
+service: restaurants-eventbus
 useDotenv: true
 
 provider:
@@ -16,4 +16,3 @@ provider:
 resources:
   - ${file(yml/eventbus.yml)}
   - ${file(yml/stream.yml)}
-  - ${file(yml/cognito.yml)}
