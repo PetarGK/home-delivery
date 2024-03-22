@@ -7,8 +7,9 @@ Resources:
       StreamEncryption:
         EncryptionType: KMS
         KeyId: alias/aws/kinesis
+      ShardCount: 1
       StreamModeDetails:
-        StreamMode: ON_DEMAND
+        StreamMode: PROVISIONED
 
   BusStreamRole:
     Type: AWS::IAM::Role

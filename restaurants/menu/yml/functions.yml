@@ -40,17 +40,28 @@ rest:
           scopes:
             - aws.cognito.signin.user.admin
 
-listener:
-  handler: src/functions/listener/index.handle
-  events:
-    - stream:
-        type: kinesis
-        arn: ${cf:${self:custom.busStack}.streamArn}
-        batchSize: 100
-        startingPosition: TRIM_HORIZON
+# listener:
+#   handler: src/functions/listener/index.handle
+#   iamRoleStatementsName: ${self:provider.stackName}-listener-role
+#   events:
+#     - stream:
+#         type: kinesis
+#         arn: ${cf:${self:custom.busStack}.streamArn}
+#         batchSize: 100
+#         startingPosition: TRIM_HORIZON
 
 trigger:
   handler: src/functions/trigger/index.handle
+  environment:
+    BUS_NAME: ${cf:${self:custom.busStack}.busName}
+    DEBUG: "*"
+  iamRoleStatementsName: ${self:provider.stackName}-trigger-role
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - events:PutEvents
+      Resource:
+        - ${cf:${self:custom.busStack}.busArn}
   events:
     - stream:
         type: dynamodb

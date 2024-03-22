@@ -1,0 +1,20 @@
+Resources:
+  Bucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    Properties:
+      BucketName: ${opt:stage}-${self:service}-events
+      AccessControl: Private
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      VersioningConfiguration:
+        Status: Enabled
+Outputs:
+  bucketName:
+    Value:
+      Ref: Bucket
+  bucketArn:
+    Value:
+      Fn::GetAtt: [Bucket, Arn]

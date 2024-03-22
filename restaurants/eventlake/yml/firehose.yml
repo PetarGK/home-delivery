@@ -1,0 +1,107 @@
+Resources:
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/kinesisfirehose/${opt:stage}-${self:service}-DeliveryStream
+      RetentionInDays: 3
+
+  LogStream:
+    Type: AWS::Logs::LogStream
+    Properties:
+      LogGroupName:
+        Ref: LogGroup
+      LogStreamName: ${self:service}
+
+  DeliveryStream:
+    Type: AWS::KinesisFirehose::DeliveryStream
+    Properties:
+      DeliveryStreamType: DirectPut
+      ExtendedS3DestinationConfiguration:
+        BucketARN:
+          Fn::GetAtt: [Bucket, Arn]
+        Prefix: ${aws:region}/
+        BufferingHints:
+          IntervalInSeconds: 60
+          SizeInMBs: 50
+        CompressionFormat: ZIP
+        RoleARN:
+          Fn::GetAtt: [DeliveryRole, Arn]
+        CloudWatchLoggingOptions:
+          Enabled: true
+          LogGroupName:
+            Ref: LogGroup
+          LogStreamName:
+            Ref: LogStream
+
+  DeliveryRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: firehose.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: delivery
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:AbortMultipartUpload
+                  - s3:GetBucketLocation
+                  - s3:GetObject
+                  - s3:ListBucket
+                  - s3:ListBucketMultipartUploads
+                  - s3:PutObject
+                Resource:
+                  - Fn::GetAtt: [Bucket, Arn]
+                  - Fn::Join:
+                      - /
+                      - - Fn::GetAtt: [Bucket, Arn]
+                        - "*"
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogStream
+                  - logs:CreateLogGroup
+                  - logs:PutLogEvents
+                Resource:
+                  - Fn::GetAtt: [LogGroup, Arn]
+
+  EventBridgeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: put
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - firehose:PutRecord
+                  - firehose:PutRecordBatch
+                Resource:
+                  - Fn::GetAtt: [DeliveryStream, Arn]
+
+  EventRule:
+    Type: AWS::Events::Rule
+    Properties:
+      EventBusName: ${cf:${self:custom.busStack}.busName}
+      EventPattern:
+        detail:
+          type:
+            - anything-but: fault
+      State: ENABLED
+      Targets:
+        - Id: EventLake
+          Arn:
+            Fn::GetAtt: [DeliveryStream, Arn]
+          RoleArn:
+            Fn::GetAtt: [EventBridgeRole, Arn]
+          InputTransformer:
+            InputTemplate: "<aws.events.event>\n" # the EOL delimiter supports parsing in cli

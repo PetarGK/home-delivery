@@ -15,4 +15,4 @@ provider:
 
 resources:
   - ${file(yml/eventbus.yml)}
-  - ${file(yml/stream.yml)}
+  # - ${file(yml/stream.yml)}

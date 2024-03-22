@@ -1,6 +1,4 @@
-import { fromDynamodb, publishToEventBridge as publish, toPromise } from 'aws-lambda-stream';
-
-const toEvent = (uow) => {
+export const toEvent = (uow) => {
   console.log(`uow: ${JSON.stringify(uow)}`);
 
   // const data = uow.event.raw.new || uow.event.raw.old;
@@ -16,16 +14,7 @@ const toEvent = (uow) => {
   // };
 
   return {
-    event: {
-      restaurant: uow.event.raw.new,
-      type: 'restaurant-created'
-    }
+    test1: "ala",
+    test2: "bala",
   };
 };
-
-export const handle = async (event) =>
-  fromDynamodb(event)
-    .map(toEvent)
-    .through(publish({ batchSize: 25 }))
-    .through(toPromise);
-

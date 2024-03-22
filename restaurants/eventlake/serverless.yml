@@ -1,4 +1,4 @@
-service: restaurants-auth
+service: restaurants-eventlake
 useDotenv: true
 
 provider:
@@ -16,11 +16,6 @@ provider:
 custom:
   busStack: ${opt:stage}-restaurants-eventbus
 
-package:
-  individually: true
-
-functions:
-  - ${file(yml/functions.yml)}
-
 resources:
-  - ${file(yml/cognito.yml)}
+  - ${file(yml/firehose.yml)}
+  - ${file(yml/s3.yml)}

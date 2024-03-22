@@ -1,0 +1,11 @@
+listener:
+  handler: src/functions/listener/index.handle
+  iamRoleStatementsName: ${self:provider.stackName}-listener-role
+  events:
+    - stream:
+        type: kinesis
+        arn: ${cf:${self:custom.busStack}.streamArn}
+        batchSize: 100
+        startingPosition: TRIM_HORIZON
+        # filterPatterns:
+        #   - eventName: [restaurant-created]
